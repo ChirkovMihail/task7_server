@@ -2,8 +2,10 @@
 
 enum REQ_TYPE
 {
-	READ = 0,
-	WRITE = 1
+	READ_START = 0,
+	READ_END = 1,
+	WRITE_START = 2,
+	WRITE_END = 3
 };
 
 class Request 
@@ -34,10 +36,10 @@ Request::Request(int _id, int _time_stamp,
 	size = _size;
 }
 
-int Request::get_time_stamp() { return time_stamp; };
+int Request::get_time_stamp() { return time_stamp; }
 
-REQ_TYPE Request::get_type() { return type; };
+REQ_TYPE Request::get_type() { return type; }
 
-int Request::get_address() { return address; };
+int Request::get_address() { return address; }
 
-int Request::get_size() { return size; };
+int Request::get_size() { return size; }
