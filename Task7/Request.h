@@ -18,6 +18,9 @@ public:
 	REQ_TYPE get_type();
 	int get_address();
 	int get_size();
+	int get_start_time();
+
+	bool operator < ( Request req);
 
 private:
 	int id;
@@ -25,6 +28,7 @@ private:
 	REQ_TYPE type;
 	int address;
 	int size;
+	int start_time;
 };
 
 Request::Request(int _id, int _time_stamp,
@@ -34,6 +38,7 @@ Request::Request(int _id, int _time_stamp,
 	type = _type;
 	address = _address;
 	size = _size;
+	start_time = _time_stamp;
 }
 
 int Request::get_time_stamp() { return time_stamp; }
@@ -43,3 +48,10 @@ REQ_TYPE Request::get_type() { return type; }
 int Request::get_address() { return address; }
 
 int Request::get_size() { return size; }
+
+int Request::get_start_time() { return start_time; }
+
+bool Request::operator < ( Request req)
+{
+	return this->start_time < req.start_time;
+}

@@ -130,6 +130,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Heap.h" />
+    <ClInclude Include="Server.h" />
     <ClInclude Include="tests.h" />
     <ClInclude Include="Treap.h" />
     <ClInclude Include="Request.h" />

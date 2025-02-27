@@ -5,6 +5,7 @@ class Treap
 {
 public:
     void insert(T key);
+    void erase(T key);
     void show_treap();
 
 private:
@@ -35,26 +36,23 @@ private:
             return b;
         }
     }
-    void split(node* ver, T key, node*& a, node*& b);
+    void split(node* ver, T key, node*& a, node*& b)
+    {
+        if (!ver) {
+            a = 0;
+            b = 0;
+            return;
+        }
+        if (ver->key < key) {
+            split(ver->right, key, ver->right, b);
+            a = ver;
+        }
+        else {
+            split(ver->left, key, a, ver->left);
+            b = ver;
+        }
+    }
 };
-
-template<class T>
-void Treap<T>::split(node* ver, T key, node*& a, node*& b)
-{
-    if (!ver) {
-        a = 0;
-        b = 0;
-        return;
-    }
-    if (ver->key < key) {
-        split(ver->right, key, ver->right, b);
-        a = ver;
-    }
-    else {
-        split(ver->left, key, a, ver->left);
-        b = ver;
-    }
-}
 
 template<class T>
 void Treap<T>::insert(T key)
