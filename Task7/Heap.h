@@ -3,19 +3,24 @@
 class Heap
 {
 public:
-	Heap(int _neutral) {
+	Heap(Request _neutral) {
 		neutral = _neutral;
 
 		head = new node(HEAD, neutral);
 		tail = 1;
 	}
 
-	int get_min()
+	Request get_min()
+	{
+		return head->key;
+	}
+
+	Request pop_min()
 	{
 		return get_heap_min();
 	}
 
-	void insert(int new_key) {
+	void insert(Request new_key) {
 		heap_insert(new_key);
 	}
 
@@ -34,10 +39,10 @@ private:
 		node* parent = NULL;
 		node* left_child = NULL;
 		node* right_child = NULL;
-		int key;
+		Request key;
 		NODE_TYPE type;
 
-		node(NODE_TYPE _type, int _key) {
+		node(NODE_TYPE _type, Request _key) {
 			type = _type;
 			key = _key;
 		}
@@ -45,7 +50,7 @@ private:
 	
 	node* head = NULL;
 	int tail;
-	int neutral;
+	Request neutral;
 	int type;
 
 	node* find_ver(int copy_tail)
@@ -77,7 +82,7 @@ private:
 		return ver;
 	}
 
-	void heap_insert(int new_key)
+	void heap_insert(Request new_key)
 	{
 		node* ver = head;
 		ver = find_ver(tail);
@@ -91,7 +96,7 @@ private:
 
 		while (ver->parent)
 		{
-			if (ver->parent->key > ver->key) {
+			if (ver->key < ver->parent->key) {
 				swap(ver->parent->key, ver->key);
 				ver = ver->parent;
 			}
@@ -100,9 +105,9 @@ private:
 		}
 	}
 
-	int get_heap_min() 
+	Request get_heap_min()
 	{
-		int res = head->key;
+		Request res = head->key;
 
 		if (res == neutral)
 			return res;
@@ -116,6 +121,8 @@ private:
 		ver->key = neutral;
 		ver->left_child = NULL;
 		ver->right_child = NULL;
+		delete ver->left_child;
+		delete ver->right_child;
 
 		ver = head;
 		while (ver->left_child && ver->right_child)
@@ -146,7 +153,7 @@ private:
 			show_heap(ver->left_child, level + 1);
 		for (int i = 0; i < level; ++i)
 			cout << "   ";
-		cout << ver->key << '\n';
+		cout << ver->key.get_start_time() << '\n';
 		if (ver->right_child)
 			show_heap(ver->right_child, level + 1);
 	}

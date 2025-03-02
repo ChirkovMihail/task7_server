@@ -20,18 +20,17 @@ void queue_tests()
 {
 	int n, i, j, x, op;
 
-	Heap* H = new Heap((int)1e9);
+	Heap* H = new Heap(Request());
 
 	cin >> n;
 	for (i = 0; i < n; ++i) {
 		cin >> op;
 		if (op == 0) {
-			cin >> x;
-			H->insert(x);
+			H->insert(Request(i + 1, i + 1, READ_START, i + 1, i + 1));
 		}
 		else
 		{
-			x = H->get_min();
+			x = H->get_min().get_start_time();
 			cout << '\t' << x << '\n';
 		}
 		H->show_heap();
@@ -42,6 +41,6 @@ void queue_tests()
 void do_tests()
 {
 	//treap_tests();
-	queue_tests();
+	//queue_tests();
 
 }
