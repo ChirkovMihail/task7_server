@@ -81,12 +81,14 @@ REQ_TIME_TYPE Request::get_time_type() { return time_type; }
 
 bool Request::operator < ( Request req)
 {
-	return this->start_time < req.start_time;
+	return this->start_time < req.start_time ||
+		this->start_time == req.start_time && this->time_type == END;
 }
 
 bool Request::operator > (Request req)
 {
-	return this->start_time > req.start_time;
+	return this->start_time > req.start_time ||
+		this->start_time == req.start_time && req.time_type == END;
 }
 
 bool Request::operator == (Request req)

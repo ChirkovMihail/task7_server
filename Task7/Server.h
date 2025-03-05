@@ -10,6 +10,10 @@ public:
 		active_req = new Request[cap];
 		heap = new Heap(Request());
 	}
+	~Server() {
+		delete heap;
+		delete active_req;
+	}
 
 	void handle_request(Request req) {
 		if (req.get_time_type() == START) {
@@ -39,32 +43,38 @@ public:
 			}
 
 			active_req[free_req_index] = req;
-			free_req_index++;			
+			free_req_index++;
 
 			req.set_start_time(req.get_start_time() + req.get_size() * req.get_lat());
 			req.set_time_type(END);
 
 			heap->insert(req);
+
 		}
-		if (req.get_time_type() == END)
-		{
-			for (int i = 0; i < free_req_index; ++i) {
-				if (req == active_req[i]) {
-					get_req_stats(active_req[i]);
-					delete &active_req[i];
-					active_req[i] = NULL;
+		else {
+			if (req.get_time_type() == END)
+			{
+				for (int i = 0; i < free_req_index; ++i) {
+					if (req == active_req[i]) {
+						get_req_stats(active_req[i]);
+						for (int j = i; j + 1 < free_req_index; ++j)
+							active_req[j] = active_req[j + 1];
+						free_req_index--;
+						active_req[free_req_index] = NULL;
+					}
 				}
 			}
 		}
-		delete& req;
 	}
 
-	bool handle_sec(int sec) 
+	bool handle_sec(int sec)
 	{
-		while (heap->get_min().get_start_time() == sec) 
+		while (heap->get_min().get_start_time() == sec)
 		{
 			handle_request(heap->pop_min());
 		}
+		//heap->show_heap();
+		return !heap->empty();
 	}
 
 private:

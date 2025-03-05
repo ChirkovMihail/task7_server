@@ -10,8 +10,8 @@ using namespace std;
 
 #include"Request.h"
 #include"Treap.h"
-#include"Server.h"
 #include"Heap.h"
+#include"Server.h"
 
 #include"tests.h"
 
@@ -35,11 +35,11 @@ int main()
 		trace[i] = Request(req_id, req_timestamp, tp, req_address, req_size, START);
 	}
 
-	int capacity = 1;
+	int capacity = 10;
 	Server server(capacity);
 
 	bool there_are_changes = true;
-	curr_sec = 0;
+	curr_sec = trace[0].get_time_stamp();
 	curr_req = 0;
 	while (there_are_changes)
 	{
@@ -48,7 +48,7 @@ int main()
 		if (server.handle_sec(curr_sec))
 			there_are_changes = true;
 
-		if (trace[curr_req].get_time_stamp() == curr_sec) {
+		if (curr_req < trace.size() && trace[curr_req].get_time_stamp() == curr_sec) {
 			server.handle_request(trace[curr_req]);
 			curr_req++;
 
@@ -57,6 +57,8 @@ int main()
 
 		curr_sec++;
 	}
+
+	fin.close();
 
 	return 0;
 }

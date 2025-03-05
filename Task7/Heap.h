@@ -3,11 +3,17 @@
 class Heap
 {
 public:
+	Heap() = default;
 	Heap(Request _neutral) {
 		neutral = _neutral;
 
 		head = new node(HEAD, neutral);
 		tail = 1;
+	}
+
+	bool empty()
+	{
+		return head->key == neutral;
 	}
 
 	Request get_min()
