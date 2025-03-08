@@ -13,6 +13,7 @@ public:
 	tuple<int, int> get_min();
 	void handle_request(Request req);	//processing request on server simulation
 	bool handle_sec(int sec);			//passing user's sec simulation
+	void show_all_statistics();
 
 private:
 	int cap;				//maximum number of simultaneously processing requests
@@ -206,4 +207,26 @@ void Server::update_stats(Request req) {
 	if (req.get_type() == WRITE)
 		write_lat.push_back(req.get_start_time() - req.get_time_stamp());
 	return;
+}
+
+void Server::show_all_statistics()
+{
+	int r, w;
+	double rd, wd;
+
+	tie(r, w) = get_median();
+	cout << "READ median : " << r << '\n';
+	cout << "WRITE median : " << w << '\n';
+
+	tie(rd, wd) = get_average();
+	cout << "READ average : " << rd << '\n';
+	cout << "WRITE average : " << wd << '\n';
+
+	tie(r, w) = get_max();
+	cout << "READ max : " << r << '\n';
+	cout << "WRITE max : " << w << '\n';
+
+	tie(r, w) = get_min();
+	cout << "READ min : " << r << '\n';
+	cout << "WRITE min : " << w << '\n';
 }

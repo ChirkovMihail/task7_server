@@ -13,17 +13,14 @@ using namespace std;
 #include"Heap.h"
 #include"Server.h"
 
-#include"tests.h"
+const int SERVER_CAP = 10;
+const int TOTAL_TRACE = 50;
 
-int main()
+void init_trace(vector<Request>&trace)
 {
-	do_tests();
-
-	int curr_sec = 0, i, curr_req;
-	int req_id, req_timestamp, req_address, req_size;
+	int req_id, req_timestamp, req_address, req_size, i;
 	string req_type;
 	REQ_TYPE tp;
-	vector<Request> trace(50);
 
 	ifstream fin("input.txt");
 	for (i = 0; i < trace.size(); ++i) {
@@ -35,19 +32,35 @@ int main()
 		trace[i] = Request(req_id, req_timestamp, tp, req_address, req_size, START);
 	}
 
-	int capacity = 1;
+	fin.close();
+}
+
+int main()
+{
+	//input requests
+	vector<Request> trace(TOTAL_TRACE);
+	init_trace(trace);
+
+	//create server
+	int capacity = SERVER_CAP;
 	Server server(capacity);
 
+
 	bool there_are_changes = true;
-	curr_sec = trace[0].get_time_stamp();
-	curr_req = 0;
+	int curr_sec = trace[0].get_time_stamp();
+	int curr_req = 0;
+
+	//while there are request to processed
+	//increase current second
 	while (there_are_changes)
 	{
 		there_are_changes = false;
 
+		//simulate another second on server
 		if (server.handle_sec(curr_sec))
 			there_are_changes = true;
 
+		//if there is request to be processed at this moment
 		if (curr_req < trace.size() && trace[curr_req].get_time_stamp() == curr_sec) {
 			server.handle_request(trace[curr_req]);
 			curr_req++;
@@ -58,15 +71,7 @@ int main()
 		curr_sec++;
 	}
 
-	double a, b;
-	tie(a, b) = server.get_average();
-	cout << a << ' ' << b << '\n';
-
-	int x, y;
-	tie(x, y) = server.get_median();
-	cout << x << ' ' << y << '\n';
-
-	fin.close();
+	server.show_all_statistics();
 
 	return 0;
 }
