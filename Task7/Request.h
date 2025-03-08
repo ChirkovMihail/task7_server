@@ -24,24 +24,28 @@ public:
 	int get_address();
 	int get_size();
 	int get_start_time();
-	int get_lat();
+	int get_lat();//returns base latency
 	REQ_TIME_TYPE get_time_type();
 
 	void set_start_time(int t);
 	void set_time_type(REQ_TIME_TYPE t);
 
-	bool operator < ( Request req);
+	//requests are compared by start_time firstly
+	//and time_type secondly
+	bool operator < (Request req);
 	bool operator > (Request req);
+
+	//equality is being checked by id
 	bool operator == (Request req);
 
 private:
-	int id;
-	int time_stamp;
-	REQ_TYPE type;
-	int address;
-	int size;
-	int start_time;
-	REQ_TIME_TYPE time_type;
+	int id;						//request's identificator
+	int time_stamp;				//request's arrival time
+	REQ_TYPE type;				//request's type relatively to data manipulation
+	int address;				//index of first bit to be processed
+	int size;					//number of bits to be processed
+	int start_time;				//actual time request starts
+	REQ_TIME_TYPE time_type;	//request's type realatively to time 
 };
 
 Request::Request(int _id, int _time_stamp,
@@ -65,6 +69,7 @@ int Request::get_lat()
 		return 1;
 	if (type == READ)
 		return 2;
+	return 0;
 }
 
 int Request::get_time_stamp() { return time_stamp; }
@@ -79,7 +84,7 @@ int Request::get_start_time() { return start_time; }
 
 REQ_TIME_TYPE Request::get_time_type() { return time_type; }
 
-bool Request::operator < ( Request req)
+bool Request::operator < (Request req)
 {
 	return this->start_time < req.start_time ||
 		this->start_time == req.start_time && this->time_type == END;

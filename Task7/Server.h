@@ -11,18 +11,21 @@ public:
 	tuple<double, double> get_average();
 	tuple<int, int> get_max();
 	tuple<int, int> get_min();
-	void handle_request(Request req);
-	bool handle_sec(int sec);
+	void handle_request(Request req);	//processing request on server simulation
+	bool handle_sec(int sec);			//passing user's sec simulation
 
 private:
-	int cap;
-	int free_req_index;
-	Request* active_req;
-	Heap* heap;
+	int cap;				//maximum number of simultaneously processing requests
+	int free_req_index;		//index of the first free position for request
+	Request* active_req;	//list of requests processing in the moment
+	Heap* heap;				//priority queue for delayed requests
 
-	vector<int> read_lat, write_lat;
+	vector<int> read_lat;	//lists of latencies for single requests
+	vector<int> write_lat;
 
+	//returns true if two requests intersect
 	bool intersect(Request req1, Request req2);
+	//updates latency statistics after end of processing request
 	void update_stats(Request req);
 };
 
@@ -106,79 +109,80 @@ tuple<int, int> Server::get_min() {
 	return make_tuple(read_min, write_min);
 }
 
-tuple<int, int> Server::get_min() {
-	int read_min, write_min;
-	if (read_lat.size() > 0) {
-		read_min = *min_element(read_lat.begin(), read_lat.end());
-	}
-	else
-		read_min = -1;
-	if (write_lat.size() > 0) {
-		write_min = *min_element(write_lat.begin(), write_lat.end());
-	}
-	else
-		write_min = -1;
-	return make_tuple(read_min, write_min);
-}
-
 void Server::handle_request(Request req) {
 	if (req.get_time_type() == START) {
-
 		int max_end_time = -1;
+		//check if current requests intersects with any WRITE-requests
 		for (int i = 0; i < free_req_index; ++i) {
 			if (active_req[i].get_type() == WRITE && intersect(active_req[i], req)) {
-				max_end_time = max(max_end_time, active_req[i].get_start_time() + active_req[i].get_size() * active_req[i].get_lat());
+				max_end_time = max(max_end_time, active_req[i].get_start_time() +
+					active_req[i].get_size() * active_req[i].get_lat());
 			}
 		}
 
+		//if so, delay current request
 		if (max_end_time != -1) {
 			req.set_start_time(max_end_time);
 			heap->insert(req);
 			return;
 		}
 
+		//otherwise check if there is space for another one 
+		//active request
 		if (free_req_index == cap) {
 			int max_end_time = -1;
 			for (int i = 0; i < free_req_index; ++i) {
-				max_end_time = max(max_end_time, active_req[i].get_start_time() + active_req[i].get_size() * active_req[i].get_lat());
+				max_end_time = max(max_end_time, active_req[i].get_start_time() + 
+					active_req[i].get_size() * active_req[i].get_lat());
 			}
 
+			//if no, delay current request
 			req.set_start_time(max_end_time);
 			heap->insert(req);
 			return;
 		}
 
+		//otherwise add current request to active
 		active_req[free_req_index] = req;
 		free_req_index++;
 
+		//and insert in priority queue request with END-mark
 		req.set_start_time(req.get_start_time() + req.get_size() * req.get_lat());
 		req.set_time_type(END);
-
 		heap->insert(req);
 
+		return;
 	}
-	else {
-		if (req.get_time_type() == END)
-		{
-			for (int i = 0; i < free_req_index; ++i) {
-				if (req == active_req[i]) {
-					update_stats(req);
-					for (int j = i; j + 1 < free_req_index; ++j)
-						active_req[j] = active_req[j + 1];
-					free_req_index--;
-					active_req[free_req_index] = NULL;
-				}
+
+	if (req.get_time_type() == END)
+	{
+		//find the same request with START-mark
+		for (int i = 0; i < free_req_index; ++i) {
+			if (req == active_req[i]) {
+				update_stats(req);
+				//shift active requests 
+				for (int j = i; j + 1 < free_req_index; ++j)
+					active_req[j] = active_req[j + 1];
+
+				//free space for the next request
+				free_req_index--;
+				active_req[free_req_index] = NULL;
 			}
 		}
+		return;
 	}
 }
 
 bool Server::handle_sec(int sec)
 {
+	//check if there is erquest in queue which should be processed
+	//at this second
 	while (heap->get_min().get_start_time() == sec)
 	{
+		//if so, handle it and pop
 		handle_request(heap->pop_min());
 	}
+	//return true if there is at least one request in queue
 	return !heap->empty();
 }
 

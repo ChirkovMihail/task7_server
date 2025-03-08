@@ -19,7 +19,7 @@ int main()
 {
 	do_tests();
 
-	int curr_sec = 0, end_time, i, curr_req;
+	int curr_sec = 0, i, curr_req;
 	int req_id, req_timestamp, req_address, req_size;
 	string req_type;
 	REQ_TYPE tp;
@@ -35,7 +35,7 @@ int main()
 		trace[i] = Request(req_id, req_timestamp, tp, req_address, req_size, START);
 	}
 
-	int capacity = 10;
+	int capacity = 1;
 	Server server(capacity);
 
 	bool there_are_changes = true;
