@@ -58,6 +58,14 @@ int main()
 		curr_sec++;
 	}
 
+	double a, b;
+	tie(a, b) = server.get_average();
+	cout << a << ' ' << b << '\n';
+
+	int x, y;
+	tie(x, y) = server.get_median();
+	cout << x << ' ' << y << '\n';
+
 	fin.close();
 
 	return 0;
